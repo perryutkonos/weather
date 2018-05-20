@@ -33,10 +33,11 @@ export default class App extends React.Component {
 
                 this.setState({status: "Получение местоположение"});
 
-                navigator.geolocation.getCurrentPosition(result => {
+                navigator.geolocation.getCurrentPosition(
+                    
+                    result => {
 
                         this.setState({status: "Загрузка погоды"});
-
                         const position = {
                             latitude: result.coords.latitude,
                             longitude: result.coords.longitude,
@@ -56,13 +57,18 @@ export default class App extends React.Component {
                                 })
                             })
 
-                    }, (error) => this.setState({
+                    }, 
+                    error => this.setState({
                         error: error.code === 2 ? "Доступ к геопозиции отказан" : error.message,
                         download: true,
                         status: false,
                         refreshing: false
                     }),
-                    {enableHighAccuracy: false, timeout: 20000, maximumAge: 60000},
+                    {
+                        enableHighAccuracy: false, 
+                        timeout: 20000, 
+                        maximumAge: 60000
+                    }
                 );
             } else {
                 this.setState({
@@ -95,28 +101,32 @@ export default class App extends React.Component {
         let description = download && weather ? weather.weather[0].description : false;
 
         let MainView;
+        
         if (download) {
-            MainView = <ScrollView
-                refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={::this.getData} colors={['#ae4b84']}/>}
-            >
-                <View style={styles.content}>
+            const refreshControl = <RefreshControl refreshing={this.state.refreshing} 
+                                                    onRefresh={::this.getData}
+                                                    colors={['#ae4b84']}/>;
+            MainView = <ScrollView refreshControl={refreshControl}>
+                    <View style={styles.content}>
 
-                    {city && <Text style={styles.name}>{city}</Text>}
-                    {status && <Text style={styles.status}>{status}</Text>}
+                        {city && <Text style={styles.name}>{city}</Text>}
+                        {status && <Text style={styles.status}>{status}</Text>}
 
-                    {temp && <Text style={styles.result}>{temp}</Text>}
-                    {description && <Text style={styles.result}>{description}</Text>}
+                        {temp && <Text style={styles.result}>{temp}</Text>}
+                        {description && <Text style={styles.result}>{description}</Text>}
 
-                    {error && <Text style={styles.error}>{error}</Text>}
-                    {error && <Button style={styles.button} onPress={::this.getData} title="Попробовать снова"/>}
-                </View>
-            </ScrollView>
+                        {error && <Text style={styles.error}>{error}</Text>}
+                        {error && <Button style={styles.button} onPress={::this.getData} title="Попробовать снова"/>}
+                    </View>
+                </ScrollView>
         } else {
             MainView = <Image source={require('./src/img/icon.png')} style={{width: 150, height: 150}}/>;
         }
         return (
             <View style={styles.app}>
-                {download && <ToolbarAndroid  navIcon={require('./src/img/icon-toolbar.png')} title="DS Погода" titleColor="#fff" style={styles.toolbar}/>}
+                {download &&
+                <ToolbarAndroid navIcon={require('./src/img/icon_toolbar.png')} title="DS Погода" titleColor="#fff"
+                                style={styles.toolbar}/>}
                 <View style={styles.container}>
                     {MainView}
                 </View>
